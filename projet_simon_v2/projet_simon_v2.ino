@@ -110,16 +110,20 @@ void loop()
     }    
   } else {
       tone(ringPin, DOLOW, 400);
-      delay(100);
-      tone(ringPin, SOLLOW, 400);
+      delay(500);
+      tone(ringPin, RE, 400);
       delay(500);
       tone(ringPin, MILOW, 400);
+      delay(500);
+      tone(ringPin, FA, 400);
+      delay(500);
+      tone(ringPin, SOLLOW, 400);
+      delay(500);
+      tone(ringPin, LA, 400);
       delay(500);
       tone(ringPin, SILOW, 400);
       delay(500);
-      tone(ringPin, FALOW, 400);
-      delay(100);
-      tone(ringPin, MILOW, 400);
+      tone(ringPin, DO, 400);
       delay(500);
     }
 }
