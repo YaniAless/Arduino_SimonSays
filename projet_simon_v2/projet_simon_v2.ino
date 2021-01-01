@@ -1,44 +1,49 @@
-  // Normal music notes (Hz)
-  const int DO = 1047;
-  const int RE = 1174;
-  const int MI = 1319;
-  const int FA = 1397;
-  const int SOL = 1568;
-  const int LA = 1760;
-  const int SI = 1976;
+#include <SoftwareSerial.h>
+
+// Bluetooth
+SoftwareSerial BLSerial(10, 11); // RX, TX
+  
+// Normal music notes (Hz)
+const int DO = 1047;
+const int RE = 1174;
+const int MI = 1319;
+const int FA = 1397;
+const int SOL = 1568;
+const int LA = 1760;
+const int SI = 1976;
 
 // Low music notes (Hz)
-  const int DOLOW = 261;
-  const int RELOW = 293;
-  const int MILOW = 329;
-  const int FALOW = 349;
-  const int SOLLOW = 392;
-  const int LALOW = 440;
-  const int SILOW = 493;
+const int DOLOW = 261;
+const int RELOW = 293;
+const int MILOW = 329;
+const int FALOW = 349;
+const int SOLLOW = 392;
+const int LALOW = 440;
+const int SILOW = 493;
 
-  const int btnOnOffPin = 8;
-  const int buttonPin1 = 9;
-  const int buttonPin2 = 10;
-  const int buttonPin3 = 11;
-  const int buttonPin4 = 12;
+const int btnOnOffPin = 8;
+const int buttonPin1 = 9;
+const int buttonPin2 = 10;
+const int buttonPin3 = 11;
+const int buttonPin4 = 12;
 
-  const int ledPin1 = 2;
-  const int ledPin2 = 3;
-  const int ledPin3 = 4;
-  const int ledPin4 = 1;
+const int ledPin1 = 2;
+const int ledPin2 = 3;
+const int ledPin3 = 4;
+const int ledPin4 = 1;
 
-  const int ringPin = 7;
+const int ringPin = 7;
 
-  int buttonState1 = 1;
-  int buttonState2 = 1;
-  int buttonState3 = 1;
-  int buttonState4 = 1;
-  
-  int winStreak = 0;
-  int colorTab[50] = {};
-  int numberOfValues = 0;
+int buttonState1 = 1;
+int buttonState2 = 1;
+int buttonState3 = 1;
+int buttonState4 = 1;
 
-  bool start = false;
+int winStreak = 0;
+int colorTab[50] = {};
+int numberOfValues = 0;
+
+bool start = false;
 
 void setup()
 {
@@ -212,6 +217,10 @@ int getLedPinByValue(int value) {
   } else {
    	return ledPin4; 
   }
+}
+
+void listenToInputsFromBluetooth(){
+
 }
 
 int getButtonPinPushed() {
