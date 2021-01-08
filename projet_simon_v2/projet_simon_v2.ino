@@ -1,12 +1,11 @@
 #include <SoftwareSerial.h>
 
-
 #define RED_LED 3
 #define BLUE_LED 4
 #define GREEN_LED 5
 #define YELLOW_LED 6
-#define BTN_ONOFF = 8;
-#define RING_PIN = 7;
+#define RING_PIN 7
+#define BTN_ONOFF 8
 
 // Bluetooth
 SoftwareSerial BTModule(10, 11); // RX, TX
@@ -43,7 +42,8 @@ bool start = false;
 
 void setup()
 {
-  Serial.begin(9600);  
+  Serial.begin(115200);
+  BTModule.begin(115200);
   
   // LED  
   pinMode(RED_LED, OUTPUT);
@@ -62,7 +62,6 @@ void setup()
 
 }
 
-
 void fillLedOrderTab(){
   winStreak = 0;
   for(int i = 0; i < 4; i++){
@@ -72,10 +71,11 @@ void fillLedOrderTab(){
   numberOfValues = 4;
 }
 
-
-void loop()
-{ 
+void loop(){
   
+  while(BTModule.available()) {
+    Serial.println("waiting bluetooth");
+  }
   if(digitalRead(BTN_ONOFF) == 0){
     start = !start;
     Serial.println(start);
@@ -86,7 +86,6 @@ void loop()
       stopSound();
     }
   }
-  
   if(start) {
     showMeThePath();
   
@@ -104,22 +103,7 @@ void loop()
       success();
     }    
   } else {
-      tone(ringPin, DOLOW, 400);
-      delay(500);
-      tone(ringPin, RE, 400);
-      delay(500);
-      tone(ringPin, MILOW, 400);
-      delay(500);
-      tone(ringPin, FA, 400);
-      delay(500);
-      tone(ringPin, SOLLOW, 400);
-      delay(500);
-      tone(ringPin, LA, 400);
-      delay(500);
-      tone(ringPin, SILOW, 400);
-      delay(500);
-      tone(ringPin, DO, 400);
-      delay(500);
+      waitingMelody();
     }
 }
 
@@ -127,6 +111,7 @@ void success() {
   winStreak++;
   colorTab[numberOfValues] = random(1,5);
   numberOfValues++;
+  // BTModule.write(winStreak); ADD THIS
   winSound();
 }
 
@@ -136,6 +121,7 @@ void failureeee() {
   Serial.println(winStreak);
   lossSound();
   start = false;
+  msg = "";
   delay(1000);
 }
 
@@ -148,15 +134,15 @@ void showMeThePath() {
 
 void lightOn(int value) {
   if(value == 1) {
-    digitalWrite(BLUE_LED, HIGH);
+    digitalWrite(RED_LED, HIGH);
     tone(RING_PIN,DO,300);
   	delay(300);
-    digitalWrite(BLUE_LED, LOW);
+    digitalWrite(RED_LED, LOW);
   } else if(value == 2) {
-    digitalWrite(RED_LED, HIGH);
+    digitalWrite(BLUE_LED, HIGH);
     tone(RING_PIN,RE,300);
   	delay(300);
-    digitalWrite(RED_LED, LOW);
+    digitalWrite(BLUE_LED, LOW);
   } else if(value == 3) {
     digitalWrite(GREEN_LED, HIGH);
     tone(RING_PIN,MI,300);
@@ -183,11 +169,11 @@ int getLedPinByValue(int value) {
 }
 
 void readBluetoothInputs() {
-  while(BTModule.available()) {
     msg = BTModule.readString();
+    Serial.println(msg);
     if(msg == "r"){
       msg = "";
-      redLedButtonState = 0
+      redLedButtonState = 0;
     } else if(msg == "b"){
       msg = "";
       blueLedButtonState = 0;
@@ -197,8 +183,7 @@ void readBluetoothInputs() {
     } else if(msg == "y"){
       msg = "";
       yellowLedButtonState = 0;     
-    }    
-  }  
+    }  
 }
 
 int getButtonPinPushed() {
@@ -212,53 +197,76 @@ int getButtonPinPushed() {
   if(redLedButtonState == 0) {
     lightOn(1);
     delay(250);
+    redLedButtonState = 1;
     return 1;
   } else if(blueLedButtonState == 0) {
     lightOn(2);
     delay(250);
+    blueLedButtonState = 1;
     return 2;
   } else if(greenLedButtonState == 0) {
     lightOn(3);
     delay(250);
+    greenLedButtonState = 1;
     return 3;
   } else if(yellowLedButtonState == 0){
     lightOn(4);
     delay(250);
+    yellowLedButtonState = 1;
    	return 4; 
   }
   
 } 
 
 void startSound(){
-  tone(ringPin,SOL,700);
+  tone(RING_PIN,SOL,700);
   delay(500);
-  tone(ringPin,LA,700);
+  tone(RING_PIN,LA,700);
   delay(500);
-  tone(ringPin,SI,300);
+  tone(RING_PIN,SI,300);
   delay(1000);
 }
 
 void stopSound(){
-  tone(ringPin,MILOW,700);
+  tone(RING_PIN,MILOW,700);
   delay(500);
-  tone(ringPin,RELOW,700);
+  tone(RING_PIN,RELOW,700);
   delay(500);
-  tone(ringPin,DOLOW,700);
+  tone(RING_PIN,DOLOW,700);
   delay(1000);
 }
 
+void waitingMelody() {
+  tone(RING_PIN, DOLOW, 400);
+  delay(500);
+  //tone(RING_PIN, RE, 400);
+  //delay(500);
+  tone(RING_PIN, MILOW, 400);
+  delay(500);
+  //tone(RING_PIN, FA, 400);
+  //delay(500);
+  tone(RING_PIN, SOLLOW, 400);
+  delay(500);
+  //tone(RING_PIN, LA, 400);
+  //delay(500);
+  tone(RING_PIN, SILOW, 400);
+  delay(500);
+  //tone(RING_PIN, DO, 400);
+  //delay(500);
+}
+
 void lossSound(){
-  tone(ringPin,MILOW,700);
+  tone(RING_PIN,MILOW,700);
   delay(500);
-  tone(ringPin,RELOW,700);
+  tone(RING_PIN,RELOW,700);
   delay(500);
-  tone(ringPin,DOLOW,700);
+  tone(RING_PIN,DOLOW,700);
   delay(500);
 }
 
 void winSound(){
-  tone(ringPin,SOL,500);
+  tone(RING_PIN,SOL,500);
   delay(500);
-  tone(ringPin,SI,700);
+  tone(RING_PIN,SI,700);
   delay(1000);
 }
