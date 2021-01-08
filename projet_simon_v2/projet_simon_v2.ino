@@ -1,7 +1,15 @@
 #include <SoftwareSerial.h>
 
+
+#define RED_LED 3
+#define BLUE_LED 4
+#define GREEN_LED 5
+#define YELLOW_LED 6
+#define BTN_ONOFF = 8;
+#define RING_PIN = 7;
+
 // Bluetooth
-SoftwareSerial BLSerial(10, 11); // RX, TX
+SoftwareSerial BTModule(10, 11); // RX, TX
   
 // Normal music notes (Hz)
 const int DO = 1047;
@@ -21,19 +29,6 @@ const int SOLLOW = 392;
 const int LALOW = 440;
 const int SILOW = 493;
 
-const int btnOnOffPin = 8;
-const int buttonPin1 = 9;
-const int buttonPin2 = 10;
-const int buttonPin3 = 11;
-const int buttonPin4 = 12;
-
-const int ledPin1 = 2;
-const int ledPin2 = 3;
-const int ledPin3 = 4;
-const int ledPin4 = 1;
-
-const int ringPin = 7;
-
 int buttonState1 = 1;
 int buttonState2 = 1;
 int buttonState3 = 1;
@@ -50,21 +45,15 @@ void setup()
   Serial.begin(9600);  
   
   // LED  
-  pinMode(ledPin1, OUTPUT);
-  pinMode(ledPin2, OUTPUT);
-  pinMode(ledPin3, OUTPUT);
-  pinMode(ledPin4, OUTPUT);  
+  pinMode(RED_LED, OUTPUT);
+  pinMode(BLUE_LED, OUTPUT);
+  pinMode(GREEN_LED, OUTPUT);
+  pinMode(YELLOW_LED, OUTPUT);
   
-  // Buttons  
-  pinMode(buttonPin1,INPUT_PULLUP);  
-  pinMode(buttonPin2,INPUT_PULLUP);  
-  pinMode(buttonPin3,INPUT_PULLUP);
-  pinMode(buttonPin4,INPUT_PULLUP);
-  
-  pinMode(btnOnOffPin,INPUT_PULLUP); // Turn ON/OFF Btn
+  pinMode(BTN_ONOFF, INPUT_PULLUP); // Turn ON/OFF Btn
   
   // Ring
-  pinMode(ringPin, OUTPUT); 
+  pinMode(RING_PIN, OUTPUT); 
   
   randomSeed(analogRead(0));
   
@@ -86,18 +75,18 @@ void fillLedOrderTab(){
 void loop()
 { 
   
-  if(digitalRead(btnOnOffPin) == 0){
+  if(digitalRead(BTN_ONOFF) == 0){
     start = !start;
     Serial.println(start);
-    if(start){
+    if(start) {
       startSound();
       delay(500);
-    }else {
+    } else {
       stopSound();
     }
   }
   
-  if(start){
+  if(start) {
     showMeThePath();
   
     int userAnswerTab[50] = {};
@@ -132,33 +121,6 @@ void loop()
       delay(500);
     }
 }
-
-void turnLightsOnOff(int speed){
-  
-  digitalWrite(ledPin1,HIGH);
-  tone(ringPin,DO,speed/1.5);
-  delay(speed);
-  
-  digitalWrite(ledPin1,LOW);
-  digitalWrite(ledPin2,HIGH);
-  tone(ringPin,RE,speed/1.5);
-  delay(speed);
-  
-  digitalWrite(ledPin2,LOW);
-  digitalWrite(ledPin3,HIGH);
-  tone(ringPin,MI,speed/1.5);
-  delay(speed);
-  
-  digitalWrite(ledPin3,LOW);
-  digitalWrite(ledPin4,HIGH);
-  tone(ringPin,FA,speed/1.5);  
-  delay(speed);
-  
-  digitalWrite(ledPin4,LOW);
-  
-  delay(2000);
-}
-
 
 void success() {
   winStreak++;
@@ -209,25 +171,26 @@ void lightOn(int value) {
 
 int getLedPinByValue(int value) {
   if(value == 1) {
-    return ledPin1;
+    return RED_LED;
   } else if(value == 2) {
-    return ledPin2;
+    return BLUE_LED;
   } else if(value == 3) {
-    return ledPin3;
+    return GREEN_LED;
   } else {
-   	return ledPin4; 
+   	return YELLOW_LED; 
   }
 }
 
-void listenToInputsFromBluetooth(){
-
+void readBluetoothInputs() {
+  while(BTModule.available()) {
+    msg = BTModule.readString();
+    Serial.println(msg);
+  }
+  
 }
 
 int getButtonPinPushed() {
-  buttonState1 = digitalRead(buttonPin1);
-  buttonState2 = digitalRead(buttonPin2);
-  buttonState3 = digitalRead(buttonPin3);
-  buttonState4 = digitalRead(buttonPin4);
+  readBluetoothInputs()
 
   // Cette partie ne passe pas trop bien meme en mettant 0 au lieu de 1
   while( buttonState1 == 1 && buttonState2 == 1 && 
