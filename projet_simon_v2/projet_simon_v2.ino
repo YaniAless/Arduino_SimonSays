@@ -10,6 +10,7 @@
 
 // Bluetooth
 SoftwareSerial BTModule(10, 11); // RX, TX
+String msg = "";
   
 // Normal music notes (Hz)
 const int DO = 1047;
@@ -29,10 +30,10 @@ const int SOLLOW = 392;
 const int LALOW = 440;
 const int SILOW = 493;
 
-int buttonState1 = 1;
-int buttonState2 = 1;
-int buttonState3 = 1;
-int buttonState4 = 1;
+int redLedButtonState = 1;
+int blueLedButtonState = 1;
+int greenLedButtonState = 1;
+int yellowLedButtonState = 1;
 
 int winStreak = 0;
 int colorTab[50] = {};
@@ -147,25 +148,25 @@ void showMeThePath() {
 
 void lightOn(int value) {
   if(value == 1) {
-    digitalWrite(ledPin1, HIGH);
-    tone(ringPin,DO,300);
+    digitalWrite(BLUE_LED, HIGH);
+    tone(RING_PIN,DO,300);
   	delay(300);
-    digitalWrite(ledPin1, LOW);
+    digitalWrite(BLUE_LED, LOW);
   } else if(value == 2) {
-    digitalWrite(ledPin2, HIGH);
-    tone(ringPin,RE,300);
+    digitalWrite(RED_LED, HIGH);
+    tone(RING_PIN,RE,300);
   	delay(300);
-    digitalWrite(ledPin2, LOW);
+    digitalWrite(RED_LED, LOW);
   } else if(value == 3) {
-    digitalWrite(ledPin3, HIGH);
-    tone(ringPin,MI,300);
+    digitalWrite(GREEN_LED, HIGH);
+    tone(RING_PIN,MI,300);
   	delay(300);
-    digitalWrite(ledPin3, LOW);
+    digitalWrite(GREEN_LED, LOW);
   } else {
-    digitalWrite(ledPin4, HIGH);
-    tone(ringPin,SOL,300);
+    digitalWrite(YELLOW_LED, HIGH);
+    tone(RING_PIN,SOL,300);
   	delay(300);
-    digitalWrite(ledPin4, LOW);
+    digitalWrite(YELLOW_LED, LOW);
   }
 }
 
@@ -184,42 +185,49 @@ int getLedPinByValue(int value) {
 void readBluetoothInputs() {
   while(BTModule.available()) {
     msg = BTModule.readString();
-    Serial.println(msg);
-  }
-  
+    if(msg == "r"){
+      msg = "";
+      redLedButtonState = 0
+    } else if(msg == "b"){
+      msg = "";
+      blueLedButtonState = 0;
+    } else if(msg == "g"){
+      msg = "";
+      greenLedButtonState = 0;   
+    } else if(msg == "y"){
+      msg = "";
+      yellowLedButtonState = 0;     
+    }    
+  }  
 }
 
 int getButtonPinPushed() {
-  readBluetoothInputs()
 
   // Cette partie ne passe pas trop bien meme en mettant 0 au lieu de 1
-  while( buttonState1 == 1 && buttonState2 == 1 && 
-        buttonState3 == 1 && buttonState4 == 1) {
-    buttonState1 = digitalRead(buttonPin1);
-  	buttonState2 = digitalRead(buttonPin2);
-  	buttonState3 = digitalRead(buttonPin3);
-  	buttonState4 = digitalRead(buttonPin4);
+  while( redLedButtonState == 1 && blueLedButtonState == 1 && 
+        greenLedButtonState == 1 && yellowLedButtonState == 1) {
+    readBluetoothInputs();
   }  
   
-  if(buttonState1 == 0) {
+  if(redLedButtonState == 0) {
     lightOn(1);
     delay(250);
     return 1;
-  } else if(buttonState2 == 0) {
+  } else if(blueLedButtonState == 0) {
     lightOn(2);
     delay(250);
     return 2;
-  } else if(buttonState3 == 0) {
+  } else if(greenLedButtonState == 0) {
     lightOn(3);
     delay(250);
     return 3;
-  } else if(buttonState4 == 0){
+  } else if(yellowLedButtonState == 0){
     lightOn(4);
     delay(250);
    	return 4; 
   }
   
-}
+} 
 
 void startSound(){
   tone(ringPin,SOL,700);
