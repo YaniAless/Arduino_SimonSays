@@ -72,11 +72,9 @@ void fillLedOrderTab(){
 }
 
 void loop(){
+  String startMsg = BTModule.readString();
   
-  while(BTModule.available()) {
-    Serial.println("waiting bluetooth");
-  }
-  if(digitalRead(BTN_ONOFF) == 0){
+  if(startMsg == "start"){
     start = !start;
     Serial.println(start);
     if(start) {
@@ -86,6 +84,7 @@ void loop(){
       stopSound();
     }
   }
+  
   if(start) {
     showMeThePath();
   
@@ -101,6 +100,7 @@ void loop(){
     }
     if(start){
       success();
+      BTModule.print("strk:" + String(winStreak)); // TO FINISH
     }    
   } else {
       waitingMelody();
@@ -110,17 +110,14 @@ void loop(){
 void success() {
   winStreak++;
   colorTab[numberOfValues] = random(1,5);
-  numberOfValues++;
-  // BTModule.write(winStreak); ADD THIS
+  numberOfValues++;  
   winSound();
 }
 
 void failureeee() {
-  Serial.println("You have failed.");
-  Serial.print("You have made a win streak of ");
-  Serial.println(winStreak);
   lossSound();
   start = false;
+  BTModule.write("lost");
   msg = "";
   delay(1000);
 }
@@ -188,7 +185,6 @@ void readBluetoothInputs() {
 
 int getButtonPinPushed() {
 
-  // Cette partie ne passe pas trop bien meme en mettant 0 au lieu de 1
   while( redLedButtonState == 1 && blueLedButtonState == 1 && 
         greenLedButtonState == 1 && yellowLedButtonState == 1) {
     readBluetoothInputs();
